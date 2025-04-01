@@ -10,6 +10,7 @@ import { onLoad } from '@dcloudio/uni-app'
 import {getHomeBannerApi,getHomeCategoryAPI,getHomeHotAPI} from '@/services/home'
 import { ref } from 'vue'
 import { type HotItem, type BannerItem,type CategoryItem } from '@/types/home.d.ts'
+import type { XtxGuessInstance } from '@/types/component'
 
 // 轮播图板块  开始
 const bannerList = ref<BannerItem[]>([])
@@ -47,13 +48,19 @@ onLoad (()=>{
   getHotData()
 })
 // 主页热门推荐 结束
+
+// 滚动触底逻辑
+const guessref = ref<XtxGuessInstance>()
+const OnScrollLower = () => {
+  guessref.value?.getMore()
+}
 </script>
 
 <template>
   <view class="index">
     <!-- 导航栏 -->
   <topBar></topBar>
-  <scroll-view  class="scroll-view" scroll-y>
+  <scroll-view @scrolltolower="OnScrollLower" class="scroll-view" scroll-y>
     <!-- 轮播图 -->
   <XtxSwiper :list="bannerList"></XtxSwiper>
   <!-- 分类 -->
@@ -61,7 +68,7 @@ onLoad (()=>{
   <!-- 热门推荐 -->
   <HotPanel :list="HotList"></HotPanel>
   <!-- 猜你喜欢 -->
-  <XtxGuess></XtxGuess>
+  <XtxGuess ref="guessref"></XtxGuess>
   </scroll-view>
 
   </view>

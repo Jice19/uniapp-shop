@@ -3,15 +3,28 @@ import { onMounted, ref } from 'vue'
 import {getHomeGoodsGuessLikeAPI} from '@/services/home'
 import { onLoad } from '@dcloudio/uni-app'
 import type { GuessItem } from '@/types/home'
+import type { PageParams } from '@/types/global'
+
 // 主页猜你喜欢 开始
 const likeList = ref<GuessItem[]>([])
+// 分页参数
+const pageParams: Required<PageParams> = {
+  page: 1,
+  pageSize: 10,
+}
 const getLikeData = async () => {
-  const res =  await getHomeGoodsGuessLikeAPI()
-  likeList.value = res.result.items
+  const res =  await getHomeGoodsGuessLikeAPI(pageParams)
+  // likeList.value = res.result.items
+  likeList.value.push(...res.result.items)
+  pageParams.page++
 }
 
 onMounted (()=>{
   getLikeData()
+})
+
+defineExpose({
+  getMore : getLikeData
 })
 // 主页猜你喜欢 结束
 </script>

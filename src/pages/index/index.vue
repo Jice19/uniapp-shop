@@ -60,7 +60,9 @@ const OnScrollLower = () => {
 const isTrigger = ref(false)
 const onRefresherrefresh = async() => {
   isTrigger.value = true
-  await Promise.all([ getHomeData(),getHomeCategoryData(),getHotData()])
+  // 重置数据
+  guessref.value?.resetData()
+  await Promise.all([ getHomeData(),getHomeCategoryData(),getHotData(),guessref.value?.getMore()])
   isTrigger.value = false
 }
 </script>

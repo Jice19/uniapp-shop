@@ -9,7 +9,7 @@ import type { PageParams } from '@/types/global'
 const likeList = ref<GuessItem[]>([])
 // 分页参数
 const pageParams: Required<PageParams> = {
-  page: 25,
+  page: 1,
   pageSize: 10,
 }
 
@@ -38,9 +38,19 @@ onMounted (()=>{
   getLikeData()
 })
 
+// 重置数据
+const resetData = () => {
+  pageParams.page = 1
+  likeList.value = []
+  finish.value = false
+}
+
 defineExpose({
-  getMore : getLikeData
+  getMore : getLikeData,
+  resetData
 })
+
+
 // 主页猜你喜欢 结束
 </script>
 

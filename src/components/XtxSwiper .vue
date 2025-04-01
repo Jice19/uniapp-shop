@@ -10,11 +10,9 @@ const onChange: UniHelper.SwiperOnChange = (ev) => {
   activeIndex.value = ev.detail.current
 }
 // 定义 props 接收
-const props= defineProps<{
+defineProps<{
   list: BannerItem[]
 }>()
-console.log(props);
-
 </script>
 
 <template>
@@ -23,7 +21,7 @@ console.log(props);
       <swiper-item v-for="item in list" :key="item.id">
         <navigator url="/pages/index/index" hover-class="none" class="navigator">
           <image mode="aspectFill" class="image" :src="item.imgUrl"></image>
-        </navigator> 
+        </navigator>
       </swiper-item>
     </swiper>
     <!-- 指示点 -->

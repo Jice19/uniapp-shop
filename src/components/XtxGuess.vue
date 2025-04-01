@@ -9,14 +9,29 @@ import type { PageParams } from '@/types/global'
 const likeList = ref<GuessItem[]>([])
 // 分页参数
 const pageParams: Required<PageParams> = {
-  page: 1,
+  page: 25,
   pageSize: 10,
 }
+
+// 是否已经结束
+const finish = ref(false)
 const getLikeData = async () => {
+  // 如果已经结束了，就不再请求
+  if (finish.value === true) {
+    return uni.showToast({
+      title: '没有更多了',
+      icon: 'none',
+    })
+  }
   const res =  await getHomeGoodsGuessLikeAPI(pageParams)
   // likeList.value = res.result.items
   likeList.value.push(...res.result.items)
-  pageParams.page++
+  if(pageParams.page < res.result.pages){
+    // 页面累加
+    pageParams.page++
+  }else{
+    finish.value = true
+  }
 }
 
 onMounted (()=>{
@@ -53,7 +68,7 @@ defineExpose({
       </view>
     </navigator>
   </view>
-  <view class="loading-text"> 正在加载... </view>
+  <view class="loading-text"> {{ finish ? "没有更多咯":"正在加载..." }} </view>
 </template>
 
 <style lang="scss">

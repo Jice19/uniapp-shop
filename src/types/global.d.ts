@@ -1,3 +1,4 @@
+import { GuessItem } from "./home"
 /** 通用分页结果类型 */
 export type PageResult<T> = {
   /** 列表数据 */
@@ -19,3 +20,7 @@ export type PageParams = {
   /** 页大小：默认值为 10 */
   pageSize?: number
 }
+
+// src/types/global.d.ts
+/** 通用商品类型 */
+export type GoodsItem = GuessItem

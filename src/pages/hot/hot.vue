@@ -1,7 +1,9 @@
 // /src/pages/hot/hot.vue
 <script setup lang="ts">
 import { getHotRecommendAPI } from '@/services/hot';
+import type { SubTypeItem } from '@/types/hot';
 import { onLoad } from '@dcloudio/uni-app';
+import { ref } from 'vue';
 // 热门推荐页 标题和url
 const hotMap = [
   { type: '1', title: '特惠推荐', url: '/hot/preference' },
@@ -16,23 +18,64 @@ const query = defineProps<
   type:string
 }>()
 // console.log(query);
+//获取当前信息
+const currHot = hotMap.find((v) => v.type === query.type)
 
 //找出数组当中的type进行对比
 const currUrlMap = hotMap.find((v) => v.type === query.type)
 // 设置跳转标题
 uni.setNavigationBarTitle({ title: currUrlMap!.title })
 
+
+// 设置背景图
+const bannnerPicture = ref('')
+// 设置头部导航栏
+const subTypes = ref(<SubTypeItem[]>[])
+// 设置高亮下标
+const activeIndex = ref(0)
 // 设置请求函数
 const getRecommendData = async () => {
   const res = await getHotRecommendAPI(currUrlMap!.url)
   console.log(res);
-
+  //保存封面
+  bannnerPicture.value = res.result.bannerPicture
+  // 保存列表
+  subTypes.value = res.result.subTypes
 }
 
 // 加载调用请求函数
 onLoad(() => {
   getRecommendData()
 })
+
+
+// 滚动触底
+const onScrolltolower = async () => {
+  // 获取当前选项
+  const currsubTypes = subTypes.value[activeIndex.value]
+  // 分页条件
+  if (currsubTypes.goodsItems.page < currsubTypes.goodsItems.pages) {
+    // 当前页码累加
+    currsubTypes.goodsItems.page++
+  } else {
+    // 标记已结束
+    currsubTypes.finish = true
+    // 退出并轻提示
+    return uni.showToast({ icon: 'none', title: '没有更多数据了~' })
+  }
+  // 调用API传参
+const res = await getHotRecommendAPI(currHot!.url, {
+    subType: currsubTypes.id,
+    page: currsubTypes.goodsItems.page,
+    pageSize: currsubTypes.goodsItems.pageSize,
+  })
+  // 新的列表选项
+  const newsubTypes = res.result.subTypes[activeIndex.value]
+  // 数组追加
+  currsubTypes.goodsItems.items.push(...newsubTypes.goodsItems.items)
+}
+
+
 
 </script>
 
@@ -41,36 +84,44 @@ onLoad(() => {
     <!-- 推荐封面图 -->
     <view class="cover">
       <image
-        src="http://yjy-xiaotuxian-dev.oss-cn-beijing.aliyuncs.com/picture/2021-05-20/84abb5b1-8344-49ae-afc1-9cb932f3d593.jpg"
+        :src="bannnerPicture"
       ></image>
     </view>
     <!-- 推荐选项 -->
-    <view class="tabs">
-      <text class="text active">抢先尝鲜</text>
-      <text class="text">新品预告</text>
+    <view class="tabs" >
+      <text class="text" v-for="(item,index) in subTypes" :key="item.id"
+      :class="{active: index === activeIndex}"
+      @tap="activeIndex = index"
+      >{{ item.title }}</text>
     </view>
-    <!-- 推荐列表 -->
-    <scroll-view scroll-y class="scroll-view">
+     <!-- 推荐列表 -->
+     <scroll-view
+      v-for="(item, index) in subTypes"
+      :key="item.id"
+      v-show="activeIndex === index"
+      scroll-y
+      class="scroll-view"
+      @scrolltolower="onScrolltolower"
+    >
       <view class="goods">
         <navigator
           hover-class="none"
           class="navigator"
-          v-for="goods in 10"
-          :key="goods"
-          :url="`/pages/goods/goods?id=`"
+          v-for="goods in item.goodsItems.items"
+          :key="goods.id"
+          :url="`/pages/goods/goods?id=${goods.id}`"
         >
-          <image
-            class="thumb"
-            src="https://yanxuan-item.nosdn.127.net/5e7864647286c7447eeee7f0025f8c11.png"
-          ></image>
-          <view class="name ellipsis">不含酒精，使用安心爽肤清洁湿巾</view>
+          <image class="thumb" :src="goods.picture"></image>
+          <view class="name ellipsis">{{ goods.name }}</view>
           <view class="price">
             <text class="symbol">¥</text>
-            <text class="number">29.90</text>
+            <text class="number">{{ goods.price }}</text>
           </view>
         </navigator>
       </view>
-      <view class="loading-text">正在加载...</view>
+      <view class="loading-text">
+        {{ item.finish ? '没有更多数据了~' : '正在加载...' }}
+      </view>
     </scroll-view>
   </view>
 </template>

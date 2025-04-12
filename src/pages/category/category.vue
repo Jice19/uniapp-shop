@@ -27,7 +27,6 @@ const getCategoryTopData = async () => {
   const res = await getCategoryTopAPI()
   categoryList.value = res.result
   // console.log(res);
-
 }
 
 
@@ -83,12 +82,12 @@ const subCategoryList = computed(() => {
             >
               <image
                 class="image"
-                src="https://yanxuan-item.nosdn.127.net/674ec7a88de58a026304983dd049ea69.jpg"
+                :src="goods.picture"
               ></image>
-              <view class="name ellipsis">木天蓼逗猫棍</view>
+              <view class="name ellipsis">{{ goods.name }}</view>
               <view class="price">
                 <text class="symbol">¥</text>
-                <text class="number">16.00</text>
+                <text class="number">{{ goods.price }}</text>
               </view>
             </navigator>
           </view>

@@ -36,7 +36,7 @@ const activeIndex = ref(0)
 // 设置请求函数
 const getRecommendData = async () => {
   const res = await getHotRecommendAPI(currUrlMap!.url)
-  console.log(res);
+  // console.log(res);
   //保存封面
   bannnerPicture.value = res.result.bannerPicture
   // 保存列表

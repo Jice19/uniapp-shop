@@ -43,6 +43,30 @@ const onTapImage = (url: string) => {
   })
 }
 // 轮播图结束
+
+// 弹出弹窗Adress和Service
+import AddressPanel from '@/components/AdressPanel.vue'
+import ServicePanel from '@/components/servicePanel.vue'
+
+// uni-ui 弹出层组件 ref
+const popup = ref<{
+  open: (type?: UniHelper.UniPopupType) => void
+  close: () => void
+}>()
+
+// 弹出层条件渲染
+const popupName = ref<'address' | 'service'>()
+const openPopup = (name: typeof popupName.value) => {
+  // 修改弹出层名称
+  popupName.value = name
+  // 打开弹出层
+  popup.value?.open()
+}
+
+// // 子调父
+const emit = defineEmits<{
+  (event: 'close'): void
+}>()
 </script>
 
 <template>
@@ -73,23 +97,23 @@ const onTapImage = (url: string) => {
         <view class="desc"> {{ goods?.desc }} </view>
       </view>
 
-      <!-- 操作面板 -->
+
+        <!-- 操作面板 -->
       <view class="action">
         <view class="item arrow">
           <text class="label">选择</text>
           <text class="text ellipsis"> 请选择商品规格 </text>
         </view>
-        <view class="item arrow">
+        <view @tap="openPopup('address')" class="item arrow">
           <text class="label">送至</text>
           <text class="text ellipsis"> 请选择收获地址 </text>
         </view>
-        <view class="item arrow">
+        <view @tap="openPopup('service')" class="item arrow">
           <text class="label">服务</text>
           <text class="text ellipsis"> 无忧退 快速退款 免费包邮 </text>
         </view>
       </view>
-    </view>
-
+  </view>
     <!-- 商品详情 -->
     <view class="detail panel">
       <view class="title">
@@ -156,6 +180,13 @@ const onTapImage = (url: string) => {
       <view class="buynow"> 立即购买 </view>
     </view>
   </view>
+
+  <!-- uni-ui 弹出层 -->
+  <uni-popup ref="popup" type="bottom" background-color="#fff">
+        <AddressPanel v-if="popupName === 'address'" @close="popup?.close()" />
+        <ServicePanel v-if="popupName === 'service'" @close="popup?.close()" />
+  </uni-popup>
+
 </template>
 
 <style lang="scss">
@@ -214,10 +245,6 @@ page {
   .preview {
     height: 750rpx;
     position: relative;
-    .image {
-      width: 750rpx;
-      height: 750rpx;
-    }
     .indicator {
       height: 40rpx;
       padding: 0 24rpx;
@@ -277,30 +304,29 @@ page {
       color: #cf4444;
     }
   }
-  .action {
-    padding-left: 20rpx;
-    .item {
-      height: 90rpx;
-      padding-right: 60rpx;
-      border-bottom: 1rpx solid #eaeaea;
-      font-size: 26rpx;
-      color: #333;
-      position: relative;
-      display: flex;
-      align-items: center;
-      &:last-child {
-        border-bottom: 0 none;
-      }
+}
+.goods .action {
+  padding-left: 20rpx;
+  .item {
+    height: 90rpx;
+    padding-right: 60rpx;
+    border-bottom: 1rpx solid #eaeaea;
+    font-size: 26rpx;
+    color: #333;
+    position: relative;
+    display: flex;
+    align-items: center;
+    &:last-child {
+      border-bottom: 0 none;
     }
-    .label {
-      width: 60rpx;
-      color: #898b94;
-      margin: 0 16rpx 0 10rpx;
-    }
-    .text {
-      flex: 1;
-      -webkit-line-clamp: 1;
-    }
+  }
+  .label {
+    width: 60rpx;
+    color: #898b94;
+    margin: 0 16rpx 0 10rpx;
+  }
+  .text {
+    flex: 1;
   }
 }
 
@@ -309,9 +335,6 @@ page {
   padding-left: 20rpx;
   .content {
     margin-left: -20rpx;
-    .image {
-      width: 100%;
-    }
   }
   .properties {
     padding: 0 20rpx;
@@ -335,20 +358,21 @@ page {
 
 /* 同类推荐 */
 .similar {
+  padding-left: 20rpx;
   .content {
-    padding: 0 20rpx 200rpx;
+    padding: 0 20rpx 20rpx;
+    margin-left: -20rpx;
     background-color: #f4f4f4;
-    display: flex;
-    flex-wrap: wrap;
-    .goods {
-      width: 340rpx;
+    overflow: hidden;
+    navigator {
+      width: 345rpx;
       padding: 24rpx 20rpx 20rpx;
-      margin: 20rpx 7rpx;
+      margin: 20rpx 20rpx 0 0;
       border-radius: 10rpx;
       background-color: #fff;
+      float: left;
     }
     .image {
-      width: 300rpx;
       height: 260rpx;
     }
     .name {
@@ -376,14 +400,9 @@ page {
 
 /* 底部工具栏 */
 .toolbar {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1;
   background-color: #fff;
   height: 100rpx;
-  padding: 0 20rpx var(--window-bottom);
+  padding: 0 20rpx;
   border-top: 1rpx solid #eaeaea;
   display: flex;
   justify-content: space-between;
@@ -402,7 +421,6 @@ page {
     .addcart {
       background-color: #ffa868;
     }
-    .buynow,
     .payment {
       background-color: #27ba9b;
       margin-left: 20rpx;
@@ -423,9 +441,6 @@ page {
       font-size: 20rpx;
       color: #333;
       background-color: #fff;
-      &::after {
-        border: none;
-      }
     }
     text {
       display: block;

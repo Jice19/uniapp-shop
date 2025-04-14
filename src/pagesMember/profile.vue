@@ -63,14 +63,19 @@ const onAvatarChange = () => {
 // 修改性别
 const onGenderChange: UniHelper.RadioGroupOnChange = (ev) => {
     profile.value.gender = ev.detail.value as Gender
-    console.log(ev.detail.value);
+    // console.log(ev.detail.value);
+}
 
+// 修改生日
+const onBirthdayChange: UniHelper.DatePickerOnChange = (ev) => {
+  profile.value.birthday = ev.detail.value
 }
 // 点击保存提交表单
 const onSubmit  = async () => {
   const res = await putMemberProfileAPI({
     nickname: profile.value?.nickname,
     gender: profile.value.gender,
+    birthday:profile.value.birthday,
   })
   // 修改仓库里面的profile的值
  memberStore.profile!.nickname = res.result.nickname
@@ -124,6 +129,7 @@ const onSubmit  = async () => {
         <view class="form-item">
           <text class="label">出生日期</text>
           <picker
+            @change="onBirthdayChange"
             class="picker"
             mode="date"
             :value="profile?.birthday"

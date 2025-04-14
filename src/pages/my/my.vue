@@ -17,6 +17,7 @@ const orderTypes = [
 // 获取用户信息
 const memberStore = useMemberStore()
 
+// 使用组合式api
 const {guessRef , onScrolltolower} = useGuessList()
 </script>
 
@@ -58,7 +59,7 @@ const {guessRef , onScrolltolower} = useGuessList()
           </view>
         </view>
       </view>
-      <navigator class="settings" url="/pagesMember/settings/settings" hover-class="none">
+      <navigator class="settings" url="/pagesMember/settings" hover-class="none">
         设置
       </navigator>
     </view>

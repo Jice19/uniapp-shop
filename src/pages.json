@@ -22,8 +22,8 @@
 		{
 			"path": "pages/my/my",
 			"style": {
-        "navigationStyle": "custom",
-        "navigationBarTextStyle": "white",
+				"navigationStyle": "custom",
+				"navigationBarTextStyle": "white",
 				"navigationBarTitleText": "我的"
 			}
 		},
@@ -96,5 +96,19 @@
 				"selectedIconPath": "static/tabs/user_selected.png"
 			}
 		]
-	}
+	},
+	// 设置分包页面
+	"subPackages": [
+		{
+			"root": "pagesMember",
+			"pages": [
+				{
+					"path": "settings",
+					"style": {
+						"navigationBarTitleText": "设置"
+					}
+				}
+			]
+		}
+	]
 }

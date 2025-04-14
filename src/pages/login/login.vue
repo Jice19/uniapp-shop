@@ -2,7 +2,8 @@
 
 <script setup lang="ts">
 import { postLoginWxMinSimpleAPI } from '@/services/login'
-
+import { useMemberStore } from '@/stores'
+import type  { LoginResult } from '@/types/member'
 //
 const onGetPhoneNuberSimple = async () => {
   const res = await postLoginWxMinSimpleAPI('19112466545')
@@ -11,6 +12,19 @@ const onGetPhoneNuberSimple = async () => {
     title: '登录成功',
     icon: 'none',
   })
+  loginSuccess(res.result)
+}
+
+const loginSuccess = (profile: LoginResult) => {
+  // 保存会员信息
+  const memberStore = useMemberStore()
+  memberStore.setProfile(profile)
+  // 成功提示
+  uni.showToast({ icon: 'success', title: '登录成功' })
+  setTimeout(() => {
+    // 页面跳转
+    uni.switchTab({ url: '/pages/my/my' })
+  }, 500)
 }
 </script>
 

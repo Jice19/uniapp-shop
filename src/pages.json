@@ -107,8 +107,21 @@
 					"style": {
 						"navigationBarTitleText": "设置"
 					}
+				},
+				{
+					"path": "profile",
+					"style": {
+						"navigationBarTitleText": "详情"
+					}
 				}
 			]
 		}
-	]
+	],
+  // 配置分包预下载规则
+  "preloadRule": {
+    "pages/my/my":{
+      "network": "all",
+      "packages": ["pagesMember"]
+    }
+  }
 }

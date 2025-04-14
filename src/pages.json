@@ -111,7 +111,9 @@
 				{
 					"path": "profile",
 					"style": {
-						"navigationBarTitleText": "详情"
+						"navigationBarTitleText": "详情",
+            "navigationStyle": "custom", // 隐藏默认导航
+				  "navigationBarTextStyle": "white"
 					}
 				}
 			]

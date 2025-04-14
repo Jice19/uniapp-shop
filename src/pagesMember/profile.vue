@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { getMemberProfileAPI, putMemberProfileAPI } from '@/services/proflie'
 import { useMemberStore } from '@/stores'
-import type { ProfileDetail } from '@/types/member'
+import type { Gender, ProfileDetail } from '@/types/member'
 import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 
@@ -60,12 +60,24 @@ const onAvatarChange = () => {
   })
 }
 
+// 修改性别
+const onGenderChange: UniHelper.RadioGroupOnChange = (ev) => {
+    profile.value.gender = ev.detail.value as Gender
+    console.log(ev.detail.value);
+
+}
 // 点击保存提交表单
 const onSubmit  = async () => {
   const res = await putMemberProfileAPI({
-    nickname: profile.value?.nickname
+    nickname: profile.value?.nickname,
+    gender: profile.value.gender,
   })
+  // 修改仓库里面的profile的值
+ memberStore.profile!.nickname = res.result.nickname
   uni.showToast({icon: 'success' , title: '保存成功'})
+  setTimeout(() => {
+    uni.navigateBack()
+  },400)
 }
 
 </script>
@@ -96,9 +108,9 @@ const onSubmit  = async () => {
           <text class="label">昵称</text>
           <input class="input" type="text" placeholder="请填写昵称" v-model="profile!.nickname" />
         </view>
-        <view class="form-item">
+        <view class="form-item" >
           <text class="label">性别</text>
-          <radio-group>
+          <radio-group @change="onGenderChange">
             <label class="radio">
               <radio value="男" color="#27ba9b" :checked="profile?.gender === '男'" />
               男

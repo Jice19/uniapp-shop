@@ -11,6 +11,7 @@ import {getHomeBannerApi,getHomeCategoryAPI,getHomeHotAPI} from '@/services/home
 import { ref } from 'vue'
 import { type HotItem, type BannerItem,type CategoryItem } from '@/types/home.d.ts'
 import type { XtxGuessInstance } from '@/types/component'
+import { useGuessList } from '@/composables'
 
 // 轮播图板块  开始
 const bannerList = ref<BannerItem[]>([])
@@ -49,11 +50,8 @@ onLoad (()=>{
 })
 // 主页热门推荐 结束
 
-// 滚动触底逻辑
-const guessref = ref<XtxGuessInstance>()
-const OnScrollLower = () => {
-  guessref.value?.getMore()
-}
+// 使用封装的hooks组合式函数实现分页加载
+const { guessRef  , onScrolltolower} = useGuessList()
 
 
 // 自定义下拉刷新
@@ -61,8 +59,8 @@ const isTrigger = ref(false)
 const onRefresherrefresh = async() => {
   isTrigger.value = true
   // 重置数据
-  guessref.value?.resetData()
-  await Promise.all([ getHomeData(),getHomeCategoryData(),getHotData(),guessref.value?.getMore()])
+  guessRef.value?.resetData()
+  await Promise.all([ getHomeData(),getHomeCategoryData(),getHotData(),guessRef.value?.getMore()])
   isTrigger.value = false
 }
 </script>
@@ -71,7 +69,7 @@ const onRefresherrefresh = async() => {
   <view class="index">
     <!-- 导航栏 -->
   <topBar></topBar>
-  <scroll-view refresher-enabled @refresherrefresh="onRefresherrefresh" :refresher-triggered="isTrigger" @scrolltolower="OnScrollLower" class="scroll-view" scroll-y>
+  <scroll-view refresher-enabled @refresherrefresh="onRefresherrefresh" :refresher-triggered="isTrigger" @scrolltolower="onScrolltolower" class="scroll-view" scroll-y>
     <!-- 轮播图 -->
   <XtxSwiper :list="bannerList"></XtxSwiper>
   <!-- 分类 -->
@@ -79,7 +77,7 @@ const onRefresherrefresh = async() => {
   <!-- 热门推荐 -->
   <HotPanel :list="HotList"></HotPanel>
   <!-- 猜你喜欢 -->
-  <XtxGuess ref="guessref"></XtxGuess>
+  <XtxGuess ref="guessRef"></XtxGuess>
   </scroll-view>
 
   </view>

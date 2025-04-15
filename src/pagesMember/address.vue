@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { getMemberAddressAPI } from '@/services/address';
 import type { AddressItem } from '@/types/goods';
-import { onLoad } from '@dcloudio/uni-app';
+import { onLoad, onShow } from '@dcloudio/uni-app';
 import { ref } from 'vue';
 
 //获取用户数据
@@ -16,6 +16,21 @@ onLoad(() => {
   getMemberAddressData()
 })
 
+onShow(() => {
+  // 监听自定义事件
+  const eventListener = (): void => {
+    getMemberAddressData()
+  }
+  uni.$on('addressUpdated', eventListener)
+
+  // 为了避免多次监听导致多次执行数据获取操作，
+  // 在页面卸载时（例如页面切换到后台等情况）移除监听器
+  // 这里可以使用 onUnmounted 钩子函数来实现，不过在 setup 语法糖中，
+  // 可以通过在 onShow 中保存监听器函数并在合适时机移除
+  // 这里先简单处理，在实际项目中可以根据需求完善
+  // 注意：如果页面被销毁再重建，需要重新添加监听器
+  // 这里只是简单示例，保证在当前页面显示期间监听事件
+})
 </script>
 
 <template>

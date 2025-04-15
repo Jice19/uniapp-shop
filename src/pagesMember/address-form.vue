@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getMemberAddressByIdAPI, postMemberAddressAPI } from '@/services/address'
+import { getMemberAddressByIdAPI, postMemberAddressAPI, putMemberAddressByIdAPI } from '@/services/address'
 import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 
@@ -31,24 +31,13 @@ const onRegionChange: UniHelper.RegionPickerOnChange = (ev) => {
   // 合并数据
   Object.assign(form.value, { provinceCode, cityCode, countyCode })
 }
-
 // 收集是否默认收货地址
 const onSwitchChange: UniHelper.SwitchOnChange = (ev) => {
   form.value.isDefault = ev.detail.value ? 1 : 0
 }
-
-// 提交表单
-const onSubmit = async () => {
-  // 新建地址请求
-  await postMemberAddressAPI(form.value)
-  // 成功提示
-  uni.showToast({ icon: 'success', title: '添加成功' })
-  // 返回上一页
-  setTimeout(() => {
-    uni.navigateBack()
-  }, 400)
-}
 // 新增地址----------结束
+
+
 
 // 修改地址 ------------开始
 // 获取修改地址详细数据
@@ -60,12 +49,32 @@ const getMemberAdressByidData = async () => {
       Object.assign(form.value, res.result)
     }
 }
+// 提交表单
+const onSubmit = async () => {
+  // 判断当前页面是否有地址 id
+  if (query.id) {
+    // 修改地址请求
+    await putMemberAddressByIdAPI(query.id, form.value)
+  } else {
+    // 新建地址请求
+    await postMemberAddressAPI(form.value)
+  }
+  // 成功提示
+  uni.showToast({ icon: 'success', title: query.id ? '修改成功' : '添加成功' })
+  //检测数据更新
+  uni.$emit('addressUpdated')
+  // 返回上一页
+  setTimeout(() => {
+    uni.navigateBack()
+  }, 400)
+}
 
 // 加载时渲染页面
 onLoad(()=> {
   getMemberAdressByidData()
 })
 // 修改地址----------结束
+
 </script>
 
 <template>

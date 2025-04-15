@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { postMemberAddressAPI } from '@/services/address'
+import { getMemberAddressByIdAPI, postMemberAddressAPI } from '@/services/address'
+import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 
 // 表单数据
@@ -13,7 +14,14 @@ const form = ref({
   address: '', // 详细地址
   isDefault: 0, // 默认地址，1为是，0为否
 })
+// 接收传过来的参数
+const query = defineProps<{
+  id:string
+}>()
+// 动态设置标题
+uni.setNavigationBarTitle({title: query.id ? "修改地址" : '新增地址'})
 
+// 新增地址----------开始
 // 收集所在地区
 const onRegionChange: UniHelper.RegionPickerOnChange = (ev) => {
   // 省市区(前端展示)
@@ -40,6 +48,24 @@ const onSubmit = async () => {
     uni.navigateBack()
   }, 400)
 }
+// 新增地址----------结束
+
+// 修改地址 ------------开始
+// 获取修改地址详细数据
+const getMemberAdressByidData = async () => {
+    // 有id才调用接口
+    if(query.id){
+      const res = await getMemberAddressByIdAPI(query.id)
+      // 把数据合并到表单中
+      Object.assign(form.value, res.result)
+    }
+}
+
+// 加载时渲染页面
+onLoad(()=> {
+  getMemberAdressByidData()
+})
+// 修改地址----------结束
 </script>
 
 <template>

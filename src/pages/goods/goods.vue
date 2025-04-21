@@ -42,6 +42,18 @@ const getDateByid = async() => {
 const isShowSku = ref(false)
 // 商品信息
 const localdata = ref({} as SkuPopupLocaldata)
+// 按钮模式
+enum Skumode {
+  Both=1,
+  Cart=2,
+  Buy=3,
+}
+// 点击选择模式
+const mode = ref<Skumode>(Skumode.Both)
+const openSkuPopup = (val:Skumode) => {
+  isShowSku.value = true ,
+  mode.value = val
+}
 
 // 页面加载时调用函数
 onLoad (() => {
@@ -69,7 +81,8 @@ const onTapImage = (url: string) => {
 // 弹出弹窗Adress和Service
 import AddressPanel from '@/components/AdressPanel.vue'
 import ServicePanel from '@/components/servicePanel.vue'
-import type { SkuPopupLocaldata } from '@/components/vk-data-goods-sku-popup/vk-data-goods-sku-popup';
+import type { SkuPopupEvent, SkuPopupLocaldata } from '@/components/vk-data-goods-sku-popup/vk-data-goods-sku-popup';
+import { postMemberCartAPI } from '@/services/cart';
 
 // uni-ui 弹出层组件 ref
 const popup = ref<{
@@ -90,10 +103,17 @@ const openPopup = (name: typeof popupName.value) => {
 const emit = defineEmits<{
   (event: 'close'): void
 }>()
+
+// 实现加入购物车： 通过sku组件的Add-cart事件实现
+const OnaddCart = async(ev: SkuPopupEvent) => {
+  await postMemberCartAPI({skuId:ev._id,  count:ev.buy_num})
+  uni.showToast({icon:'success',title:'添加成功'})
+  isShowSku.value = false
+}
 </script>
 
 <template>
-  <vk-data-goods-sku-popup :localdata="localdata" v-model="isShowSku"></vk-data-goods-sku-popup>
+  <vk-data-goods-sku-popup :localdata="localdata" v-model="isShowSku" :mode="mode" @add-cart="OnaddCart"></vk-data-goods-sku-popup>
   <scroll-view scroll-y class="viewport">
     <!-- 基本信息 -->
     <view class="goods">
@@ -124,7 +144,7 @@ const emit = defineEmits<{
 
         <!-- 操作面板 -->
       <view class="action">
-        <view class="item arrow" @tap="isShowSku = true">
+        <view class="item arrow" @tap="openSkuPopup(Skumode.Both)">
           <text class="label">选择</text>
           <text class="text ellipsis"> 请选择商品规格 </text>
         </view>
@@ -200,8 +220,8 @@ const emit = defineEmits<{
       </navigator>
     </view>
     <view class="buttons">
-      <view class="addcart"> 加入购物车 </view>
-      <view class="buynow"> 立即购买 </view>
+      <view class="addcart" @tap="openSkuPopup(Skumode.Cart)"> 加入购物车 </view>
+      <view class="buynow" @tap="openSkuPopup(Skumode.Buy)"> 立即购买 </view>
     </view>
   </view>
 

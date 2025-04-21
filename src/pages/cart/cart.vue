@@ -2,14 +2,18 @@
 import XtxGuess from '@/components/XtxGuess.vue';
 import { getMemberCartAPI } from '@/services/cart';
 import { useMemberStore } from '@/stores';
+import type { CartItem } from '@/types/cart';
 import { onLoad } from '@dcloudio/uni-app';
+import { ref } from 'vue';
 // 获取用户store
 const useMember = useMemberStore()
 
 // 获取用户数据渲染列表
+const cartData = ref<CartItem[]>([])
 const getMemberCartData = async() => {
   const res = await getMemberCartAPI()
-  console.log(res);
+  // console.log(res);
+  cartData.value = res.result
 }
 
 // 页面加载完成后发送请求
@@ -32,25 +36,25 @@ onLoad(() => {
         <!-- 滑动操作分区 -->
         <uni-swipe-action>
           <!-- 滑动操作项 -->
-          <uni-swipe-action-item v-for="item in 2" :key="item" class="cart-swipe">
+          <uni-swipe-action-item v-for="item in cartData" :key="item.id" class="cart-swipe">
             <!-- 商品信息 -->
             <view class="goods">
               <!-- 选中状态 -->
               <text class="checkbox" :class="{ checked: true }"></text>
               <navigator
-                :url="`/pages/goods/goods?id=1435025`"
+                :url="`/pages/goods/goods?id=${item.id}`"
                 hover-class="none"
                 class="navigator"
               >
                 <image
                   mode="aspectFill"
                   class="picture"
-                  src="https://yanxuan-item.nosdn.127.net/da7143e0103304f0f3230715003181ee.jpg"
+                  :src="item.picture"
                 ></image>
                 <view class="meta">
-                  <view class="name ellipsis">人手必备，儿童轻薄透气防蚊裤73-140cm</view>
-                  <view class="attrsText ellipsis">黄色小象 140cm</view>
-                  <view class="price">69.00</view>
+                  <view class="name ellipsis">{{ item.name }}</view>
+                  <view class="attrsText ellipsis">{{ item.attrsText }}</view>
+                  <view class="price">{{ item.price }}</view>
                 </view>
               </navigator>
               <!-- 商品数量 -->

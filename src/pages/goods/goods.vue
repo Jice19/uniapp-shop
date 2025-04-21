@@ -113,7 +113,12 @@ const OnaddCart = async(ev: SkuPopupEvent) => {
 </script>
 
 <template>
-  <vk-data-goods-sku-popup :localdata="localdata" v-model="isShowSku" :mode="mode" @add-cart="OnaddCart"></vk-data-goods-sku-popup>
+  <vk-data-goods-sku-popup
+  :localdata="localdata"
+  v-model="isShowSku"
+  :mode="mode"
+  @add-cart="OnaddCart"></vk-data-goods-sku-popup>
+  
   <scroll-view scroll-y class="viewport">
     <!-- 基本信息 -->
     <view class="goods">

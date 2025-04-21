@@ -9,7 +9,7 @@ import HotPanel from './components/HotPanel.vue'
 import { onLoad } from '@dcloudio/uni-app'
 import {getHomeBannerApi,getHomeCategoryAPI,getHomeHotAPI} from '@/services/home'
 import { ref } from 'vue'
-import { type HotItem, type BannerItem,type CategoryItem } from '@/types/home.d.ts'
+import type {  HotItem, BannerItem, CategoryItem } from '@/types/home'
 import type { XtxGuessInstance } from '@/types/component'
 import { useGuessList } from '@/composables'
 

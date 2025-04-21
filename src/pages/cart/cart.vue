@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import XtxGuess from '@/components/XtxGuess.vue';
-import { getMemberCartAPI } from '@/services/cart';
+import { deleteMemberCartAPI, getMemberCartAPI } from '@/services/cart';
 import { useMemberStore } from '@/stores';
 import type { CartItem } from '@/types/cart';
-import { onLoad } from '@dcloudio/uni-app';
+import type { XtxGuessInstance } from '@/types/component'
+import { onLoad, onShow } from '@dcloudio/uni-app';
 import { ref } from 'vue';
 // 获取用户store
 const useMember = useMemberStore()
@@ -17,17 +18,39 @@ const getMemberCartData = async() => {
 }
 
 // 页面加载完成后发送请求
-onLoad(() => {
-  getMemberCartData()
+onShow(() => {
+  // 前置条件：用户登录后才允许调用
+  if(useMember.profile){
+    getMemberCartData()
+  }
 })
+
+// 监听触底事件
+const guessRef = ref<XtxGuessInstance>()
+const onScorlltolower = () => {
+  guessRef?.value?.getMore()
+}
+
+
+const onDeleteCart = (skuId:string) => {
+  uni.showModal({
+    content:'是否确认删除',
+    success: async(res)=>{
+      if(res.confirm){
+       await deleteMemberCartAPI({ids:[skuId]})
+       getMemberCartData()
+      }
+    },
+  })
+}
 </script>
 
 <template>
-  <scroll-view scroll-y class="scroll-view">
+  <scroll-view scroll-y class="scroll-view" @scrolltolower="onScorlltolower">
     <!-- 已登录: 显示购物车 -->
     <template v-if="useMember.profile">
       <!-- 购物车列表 -->
-      <view class="cart-list" v-if="true">
+      <view class="cart-list" v-if='cartData.length'>
         <!-- 优惠提示 -->
         <view class="tips">
           <text class="label">满减</text>
@@ -36,11 +59,11 @@ onLoad(() => {
         <!-- 滑动操作分区 -->
         <uni-swipe-action>
           <!-- 滑动操作项 -->
-          <uni-swipe-action-item v-for="item in cartData" :key="item.id" class="cart-swipe">
+          <uni-swipe-action-item v-for="item in cartData" :key="item.skuId" class="cart-swipe">
             <!-- 商品信息 -->
             <view class="goods">
               <!-- 选中状态 -->
-              <text class="checkbox" :class="{ checked: true }"></text>
+              <text class="checkbox" :class="{ checked: item.selected }"></text>
               <navigator
                 :url="`/pages/goods/goods?id=${item.id}`"
                 hover-class="none"
@@ -67,7 +90,7 @@ onLoad(() => {
             <!-- 右侧删除按钮 -->
             <template #right>
               <view class="cart-swipe-right">
-                <button class="button delete-button">删除</button>
+                <button @tap="onDeleteCart(item.skuId)" class="button delete-button">删除</button>
               </view>
             </template>
           </uni-swipe-action-item>
@@ -100,8 +123,11 @@ onLoad(() => {
         <button class="button">去登录</button>
       </navigator>
     </view>
+
     <!-- 猜你喜欢 -->
-    <XtxGuess ref="guessRef"></XtxGuess>
+    <view class="guess">
+      <XtxGuess ref="guessRef" />
+    </view>
     <!-- 底部占位空盒子 -->
     <view class="toolbar-height"></view>
   </scroll-view>

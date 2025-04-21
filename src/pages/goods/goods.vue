@@ -13,7 +13,7 @@ const query = defineProps<{
 import { getDataByIdApi } from '@/services/goods';
 import type { GoodsResult } from '@/types/goods';
 import { onLoad } from '@dcloudio/uni-app';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 // 声明商品存储
 const goods = ref<GoodsResult>()
 const getDateByid = async() => {
@@ -81,7 +81,7 @@ const onTapImage = (url: string) => {
 // 弹出弹窗Adress和Service
 import AddressPanel from '@/components/AdressPanel.vue'
 import ServicePanel from '@/components/servicePanel.vue'
-import type { SkuPopupEvent, SkuPopupLocaldata } from '@/components/vk-data-goods-sku-popup/vk-data-goods-sku-popup';
+import { SkuPopupInstance, type SkuPopupEvent, type SkuPopupLocaldata } from '@/components/vk-data-goods-sku-popup/vk-data-goods-sku-popup';
 import { postMemberCartAPI } from '@/services/cart';
 
 // uni-ui 弹出层组件 ref
@@ -110,6 +110,12 @@ const OnaddCart = async(ev: SkuPopupEvent) => {
   uni.showToast({icon:'success',title:'添加成功'})
   isShowSku.value = false
 }
+
+// 计算选中属性
+const skupopupRef = ref<SkuPopupInstance>()
+const selectData = computed(() => {
+  return skupopupRef?.value?.selectArr.join(' ').trim() || '请选择商品规格'
+})
 </script>
 
 <template>
@@ -117,8 +123,9 @@ const OnaddCart = async(ev: SkuPopupEvent) => {
   :localdata="localdata"
   v-model="isShowSku"
   :mode="mode"
+  ref="skupopupRef"
   @add-cart="OnaddCart"></vk-data-goods-sku-popup>
-  
+
   <scroll-view scroll-y class="viewport">
     <!-- 基本信息 -->
     <view class="goods">

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { InputNumberBoxEvent } from '@/components/vk-data-input-number-box/vk-data-input-number-box';
 import XtxGuess from '@/components/XtxGuess.vue';
-import { deleteMemberCartAPI, getMemberCartAPI, putMemberCartBySkuIdAPI } from '@/services/cart';
+import { deleteMemberCartAPI, getMemberCartAPI, putMemberCartBySkuIdAPI, putMemberCartSelectedAPI } from '@/services/cart';
 import { useMemberStore } from '@/stores';
 import type { CartItem } from '@/types/cart';
 import type { XtxGuessInstance } from '@/types/component'
 import { onLoad, onShow } from '@dcloudio/uni-app';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 // 获取用户store
 const useMember = useMemberStore()
 
@@ -51,6 +51,26 @@ const onChangeCount = (ev:InputNumberBoxEvent) => {
   // 后端更新数据
   putMemberCartBySkuIdAPI(ev.index, { count:ev.value })
 }
+
+// 修改选中状态
+const onChangeSelected = (item : CartItem) => {
+  // 取反选中状态
+  item.selected = !item.selected
+  // 后端数据更新
+  putMemberCartBySkuIdAPI(item.skuId , {selected: item.selected})
+}
+
+// 计算全选状态
+const isSelectedAll = computed(() => {
+  return cartData.value.length && cartData.value.every((v) => v.selected)
+})
+// 修改全选状态
+const onChangeSelectedAll = () => {
+  const _isSelectedAll = !isSelectedAll.value;
+  // 使用新数组触发响应式更新
+  cartData.value = cartData.value.map(item => ({...item, selected: _isSelectedAll }));
+  putMemberCartSelectedAPI({ selected: _isSelectedAll });
+}
 </script>
 
 <template>
@@ -67,7 +87,9 @@ const onChangeCount = (ev:InputNumberBoxEvent) => {
         <!-- 滑动操作分区 -->
         <uni-swipe-action>
           <!-- 滑动操作项 -->
-          <uni-swipe-action-item v-for="item in cartData" :key="item.skuId" class="cart-swipe">
+          <uni-swipe-action-item v-for="item in cartData" :key="item.skuId" class="cart-swipe"
+            @tap="onChangeSelected(item)"
+          >
             <!-- 商品信息 -->
             <view class="goods">
               <!-- 选中状态 -->
@@ -116,7 +138,7 @@ const onChangeCount = (ev:InputNumberBoxEvent) => {
       </view>
       <!-- 吸底工具栏 -->
       <view class="toolbar">
-        <text class="all" :class="{ checked: true }">全选</text>
+        <text class="all" :class="{ checked: isSelectedAll }" @tap="onChangeSelectedAll">全选</text>
         <text class="text">合计:</text>
         <text class="amount">100</text>
         <view class="button-grounp">

@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import type { InputNumberBoxEvent } from '@/components/vk-data-input-number-box/vk-data-input-number-box';
 import XtxGuess from '@/components/XtxGuess.vue';
-import { deleteMemberCartAPI, getMemberCartAPI } from '@/services/cart';
+import { deleteMemberCartAPI, getMemberCartAPI, putMemberCartBySkuIdAPI } from '@/services/cart';
 import { useMemberStore } from '@/stores';
 import type { CartItem } from '@/types/cart';
 import type { XtxGuessInstance } from '@/types/component'
@@ -43,6 +44,13 @@ const onDeleteCart = (skuId:string) => {
     },
   })
 }
+
+
+// 修改商品单品
+const onChangeCount = (ev:InputNumberBoxEvent) => {
+  // 后端更新数据
+  putMemberCartBySkuIdAPI(ev.index, { count:ev.value })
+}
 </script>
 
 <template>
@@ -81,11 +89,13 @@ const onDeleteCart = (skuId:string) => {
                 </view>
               </navigator>
               <!-- 商品数量 -->
-              <view class="count">
-                <text class="text">-</text>
-                <input class="input" type="number" value="1" />
-                <text class="text">+</text>
-              </view>
+              <vk-data-input-number-box
+                v-model="item.count"
+                :min="1"
+                :max="item.stock"
+                :index="item.skuId"
+                @change="onChangeCount"
+              ></vk-data-input-number-box>
             </view>
             <!-- 右侧删除按钮 -->
             <template #right>

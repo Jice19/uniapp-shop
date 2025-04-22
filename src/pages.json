@@ -135,6 +135,17 @@
 					}
 				}
 			]
+		},
+		{
+			"root": "pageorder",
+			"pages": [
+				{
+					"path": "create",
+					"style": {
+						"navigationBarTitleText": "填写订单"
+					}
+				}
+			]
 		}
 	],
 	// 配置分包预下载规则

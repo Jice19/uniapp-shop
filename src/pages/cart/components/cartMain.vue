@@ -98,10 +98,7 @@ const gotoPayment = () => {
       title: '请选择商品',
     })
   }
-  uni.showToast({
-    icon:"none",
-    title:'等待升级'
-  })
+  uni.navigateTo({url:'/pageorder/create'})
 }
 </script>
 

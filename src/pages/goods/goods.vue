@@ -116,6 +116,14 @@ const skupopupRef = ref<SkuPopupInstance>()
 const selectData = computed(() => {
   return skupopupRef?.value?.selectArr.join(' ').trim() || '请选择商品规格'
 })
+
+// sku立即购买事件
+const onBuyNow = async (ev:SkuPopupEvent) => {
+  // 跳转页面并传参
+  uni.navigateTo({url:`/pageorder/create?skuId=${ev._id}&count =${ev.buy_num}`})
+  // 关闭sku组件
+  isShowSku.value=false
+}
 </script>
 
 <template>
@@ -124,7 +132,9 @@ const selectData = computed(() => {
   v-model="isShowSku"
   :mode="mode"
   ref="skupopupRef"
-  @add-cart="OnaddCart"></vk-data-goods-sku-popup>
+  @add-cart="OnaddCart"
+  @buy-now="onBuyNow"
+  ></vk-data-goods-sku-popup>
 
   <scroll-view scroll-y class="viewport">
     <!-- 基本信息 -->

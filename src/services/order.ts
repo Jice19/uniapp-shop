@@ -37,3 +37,11 @@ export const postMemberOrderAPI = (data: OrderCreateParams) => {
     data,
   })
 }
+
+// 封装请求订单
+export const getMemberOrderAPI= (id:string ) => {
+  return http({
+    method: 'GET',
+    url: `/member/order/${id}`,
+  })
+}
